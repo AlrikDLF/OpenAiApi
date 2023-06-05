@@ -10,5 +10,5 @@ class User {
     }
   }
   
-  module.exports = User;
+  export default User;
   

@@ -8,5 +8,5 @@ class Universe {
     }
   }
   
-  module.exports = Universe;
+  export default Universe;
   

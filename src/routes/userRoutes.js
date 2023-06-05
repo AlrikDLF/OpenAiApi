@@ -1,20 +1,71 @@
+import { addUser } from './repositories/userRepository';
+
 // Création d'un nouvel utilisateur
 app.post('/users', (req, res) => {
-    // Logique pour la création d'un nouvel utilisateur
-  });
+  const newUser = {
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password
+  };
+
+  addUser(newUser)
+    .then(user => {
+      res.status(201).json(user);
+    })
+    .catch(error => {
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: 'Failed to create user' });
+    });
+});
 
 
 // Modification d'un utilisateur | Vérification du token
 app.put('/users/:x', (req, res) => {
-    // Logique pour la modification d'un utilisateur
-  });
+  const userId = req.params.x;
+  const userData = req.body; // Données de l'utilisateur à mettre à jour
+
+  // Appel de la fonction updateUser du userRepository
+  userRepository.updateUser(userId, userData)
+    .then(updatedUser => {
+      // Utilisateur mis à jour avec succès
+      res.json(updatedUser);
+    })
+    .catch(error => {
+      // Gestion des erreurs lors de la mise à jour de l'utilisateur
+      res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur' });
+    });
+});
 
 // Récupération d'un utilisateur
 app.get('/users/:x', (req, res) => {
-    // Logique pour la récupération d'un utilisateur
-  });
+  const userId = req.params.x;
+
+  // Appel de la fonction getUserById du userRepository
+  userRepository.getUserById(userId)
+    .then(user => {
+      if (user) {
+        // Utilisateur trouvé avec succès
+        res.status(200).json(user);
+      } else {
+        // Utilisateur non trouvé
+        res.status(404).json({ error: 'Utilisateur non trouvé' });
+      }
+    })
+    .catch(error => {
+      // Gestion des erreurs lors de la récupération de l'utilisateur
+      res.status(500).json({ error: 'Erreur lors de la récupération de l\'utilisateur' });
+    });
+});
 
 // Récupération de l'ensemble des utilisateurs
 app.get('/users', (req, res) => {
-    // Logique pour la récupération de l'ensemble des utilisateurs
-  });
+  // Appel de la fonction getAllUsers du userRepository
+  userRepository.getAllUsers()
+    .then(users => {
+      res.json(users);
+    })
+    .catch(error => {
+      // Gestion des erreurs lors de la récupération des utilisateurs
+      res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
+    });
+});
