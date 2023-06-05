@@ -1,0 +1,42 @@
+- src
+  - app.js               // Point d'entrée de l'application
+  - server.js            // Initialisation du serveur Express
+  - controllers/         // Répertoire des contrôleurs
+    - userController.js  // Contrôleur pour les routes relatives aux utilisateurs
+    - universeController.js // Contrôleur pour les routes relatives aux univers
+    - characterController.js // Contrôleur pour les routes relatives aux personnages
+    - conversationController.js // Contrôleur pour les routes relatives aux conversations
+    - messageController.js // Contrôleur pour les routes relatives aux messages
+  - entities/            // Répertoire des entités (modèles de données)
+    - User.js            // Modèle pour les utilisateurs
+    - Universe.js        // Modèle pour les univers
+    - Character.js       // Modèle pour les personnages
+    - Conversation.js    // Modèle pour les conversations
+    - Message.js         // Modèle pour les messages
+  - middleware/          // Répertoire des middlewares
+    - authentication.js  // Middleware d'authentification
+    - authorization.js   // Middleware d'autorisation
+  - routes/              // Répertoire des routes
+    - userRoutes.js      // Définition des routes pour les utilisateurs
+    - universeRoutes.js  // Définition des routes pour les univers
+    - characterRoutes.js // Définition des routes pour les personnages
+    - conversationRoutes.js // Définition des routes pour les conversations
+    - messageRoutes.js   // Définition des routes pour les messages
+  - services/            // Répertoire des services
+    - userService.js     // Service pour la logique des utilisateurs
+    - universeService.js // Service pour la logique des univers
+    - characterService.js // Service pour la logique des personnages
+    - conversationService.js // Service pour la logique des conversations
+    - messageService.js  // Service pour la logique des messages
+  - repositories/        // Répertoire des repositories (accès à la base de données)
+    - userRepository.js  // Repository pour les utilisateurs
+    - universeRepository.js // Repository pour les univers
+    - characterRepository.js // Repository pour les personnages
+    - conversationRepository.js // Repository pour les conversations
+    - messageRepository.js // Repository pour les messages
+  - utils/               // Répertoire des utilitaires
+    - authUtils.js       // Fonctions utilitaires pour l'authentification
+    - errorUtils.js      // Fonctions utilitaires pour la gestion des erreurs
+  - config/              // Répertoire de configuration
+    - database.js        // Configuration de la base de données
+    - auth.js            // Configuration de l'authentification
