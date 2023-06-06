@@ -4,7 +4,7 @@ const { Router } = require('express');
 const router = Router();
 
 // Création d'un nouvel utilisateur
-router.post('/users', (req, res) => {
+router.post('/', (req, res) => {
   const newUser = {
     name: req.body.name,
     email: req.body.email,
@@ -23,7 +23,7 @@ router.post('/users', (req, res) => {
 
 
 // Modification d'un utilisateur | Vérification du token
-router.put('/users/:x', (req, res) => {
+router.put('/:x', (req, res) => {
   const userId = req.params.x;
   const userData = req.body; // Données de l'utilisateur à mettre à jour
 
@@ -40,7 +40,7 @@ router.put('/users/:x', (req, res) => {
 });
 
 // Récupération d'un utilisateur
-router.get('/users/:x', (req, res) => {
+router.get('/:x', (req, res) => {
   const userId = req.params.x;
 
   // Appel de la fonction getUserById du userRepository
@@ -61,7 +61,7 @@ router.get('/users/:x', (req, res) => {
 });
 
 // Récupération de l'ensemble des utilisateurs
-router.get('/users', (req, res) => {
+router.get('/', (req, res) => {
   // Appel de la fonction getAllUsers du userRepository
   userRepository.getAllUsers()
     .then(users => {

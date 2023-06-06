@@ -5,7 +5,7 @@ const { Router } = require('express');
 const router = Router();
 
 // Récupération des conversations en cours qui renvoie aussi l'ID du personnage et de l'univers
-router.get('/conversations', (req, res) => {
+router.get('/', (req, res) => {
   conversationRepository.getAllConversations()
     .then(conversations => {
       const formattedConversations = conversations.map(conversation => {
@@ -24,7 +24,7 @@ router.get('/conversations', (req, res) => {
 });
   
   // Création d'une nouvelle conversation avec un personnage
-  router.post('/conversations', (req, res) => {
+  router.post('/', (req, res) => {
     const { characterId } = req.body; // ID du personnage
     const conversation = {
       characterId,
@@ -43,7 +43,7 @@ router.get('/conversations', (req, res) => {
   
   
   // Récupération d'une conversation avec le personnage et l'univers complet
-  router.get('/conversations/:id', (req, res) => {
+  router.get('/:id', (req, res) => {
     const conversationId = req.params.id;
   
     conversationRepository.getConversationWithCharacterAndUniverse(conversationId)
@@ -62,7 +62,7 @@ router.get('/conversations', (req, res) => {
   
   
   // Suppression d'une conversation avec un personnage
-  router.delete('/conversations/:x', (req, res) => {
+  router.delete('/:x', (req, res) => {
     const conversationId = req.params.x;
   
     conversationRepository.deleteConversation(conversationId)
@@ -81,7 +81,7 @@ router.get('/conversations', (req, res) => {
   
   
   // Récupération de l'historique des messages d'une conversation
-  router.get('/conversations/:x/messages', (req, res) => {
+  router.get('/:x/messages', (req, res) => {
     const conversationId = req.params.x;
   
     conversationRepository.getMessagesByConversation(conversationId)
@@ -95,7 +95,7 @@ router.get('/conversations', (req, res) => {
   });  
   
   // Envoi d'un nouveau message dans la conversation
-  router.post('/conversations/:x/messages', (req, res) => {
+  router.post('/:x/messages', (req, res) => {
     const conversationId = req.params.x;
     const { content, senderId } = req.body;
   
@@ -116,7 +116,7 @@ router.get('/conversations', (req, res) => {
   });  
   
   // Regénération du dernier message d'une conversation
-  router.put('/conversations/:conversationId', (req, res) => {
+  router.put('/:conversationId', (req, res) => {
     const conversationId = req.params.conversationId;
   
     // Logique pour la régénération du dernier message d'une conversation

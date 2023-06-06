@@ -16,9 +16,10 @@ const userRoutes = require('./routes/userRoutes');
 const conversationRoutes = require('./routes/conversationRoutes');
 const universeRoutes = require('./routes/universeRoutes');
 
-// Charger les routes des utilisateurs
+// Charger les routes 
 app.use('/users', userRoutes);
 app.use('/conversations', conversationRoutes);
+app.use('/universes', universeRoutes);
 
 // Démarrer le serveur sur le port 3000
 app.listen(3000, () => {
