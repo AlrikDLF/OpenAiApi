@@ -1,14 +1,15 @@
-import { query } from '../config/database';
-import Universe from '../entities/Universe';
+const db = require('../db');
+const Universe = require('../entities/Universe');
+
 
 class UniverseRepository {
   getAllUniverses() {
-    return query('SELECT * FROM universe')
+    return db.query('SELECT * FROM universe')
       .then(rows => rows.map(row => new Universe(row.id, row.name, row.description)));
   }
 
   getUniverseById(id) {
-    return query('SELECT * FROM universe WHERE id = ?', [id])
+    return db.query('SELECT * FROM universe WHERE id = ?', [id])
       .then(rows => {
         if (rows.length > 0) {
           const { id, name, description } = rows[0];
@@ -19,7 +20,7 @@ class UniverseRepository {
   }
 
   getCharactersByUniverse(universeId) {
-    return query('SELECT * FROM character WHERE universe_id = ?', [universeId])
+    return db.query('SELECT * FROM character WHERE universe_id = ?', [universeId])
       .then(rows => {
         return rows;
       })
@@ -29,7 +30,7 @@ class UniverseRepository {
   }
 
   addUniverse(universe) {
-    return query('INSERT INTO universe (name, description) VALUES (?, ?)', [universe.name, universe.description])
+    return db.query('INSERT INTO universe (name, description) VALUES (?, ?)', [universe.name, universe.description])
       .then(result => {
         const { insertId } = result;
         return new Universe(insertId, universe.name, universe.description);
@@ -37,7 +38,7 @@ class UniverseRepository {
   }
 
   updateUniverse(universe) {
-    return query('UPDATE universe SET name = ?, description = ? WHERE id = ?', [universe.name, universe.description, universe.id])
+    return db.query('UPDATE universe SET name = ?, description = ? WHERE id = ?', [universe.name, universe.description, universe.id])
       .then(result => {
         if (result.affectedRows > 0) {
           return universe;
@@ -47,7 +48,7 @@ class UniverseRepository {
   }
 
   deleteUniverse(id) {
-    return query('DELETE FROM universe WHERE id = ?', [id])
+    return db.query('DELETE FROM universe WHERE id = ?', [id])
       .then(result => {
         if (result.affectedRows > 0) {
           return id;
@@ -59,10 +60,10 @@ class UniverseRepository {
   deleteUniverseAndCharacters(universeId) {
     return new Promise((resolve, reject) => {
       // Supprimer les personnages associés à l'univers
-      query('DELETE FROM character WHERE universeId = ?', [universeId])
+      db.query('DELETE FROM character WHERE universeId = ?', [universeId])
         .then(() => {
           // Supprimer l'univers lui-même
-          return query('DELETE FROM universe WHERE id = ?', [universeId]);
+          return db.query('DELETE FROM universe WHERE id = ?', [universeId]);
         })
         .then(result => {
           if (result.affectedRows > 0) {
@@ -79,4 +80,4 @@ class UniverseRepository {
   
 }
 
-export default UniverseRepository;
+module.exports = UniverseRepository;

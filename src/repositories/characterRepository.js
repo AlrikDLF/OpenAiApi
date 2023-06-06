@@ -1,5 +1,5 @@
-import { query } from '../config/database';
-import Character from '../entities/Character';
+const db = require('../db');
+const Character = require('../entities/Character');
 
 class CharacterRepository {
   getAllCharacters() {
@@ -19,7 +19,7 @@ class CharacterRepository {
   }
 
   addCharacter(character) {
-    return query('INSERT INTO character (name, description, universe_id) VALUES (?, ?)', [character.name, character.description])
+    return query('INSERT INTO character (name, description, universe_id) VALUES (?, ?)', [character.name, character.description, character.universe_id])
       .then(result => {
         const { insertId } = result;
         return new Character(insertId, character.name, character.description, character.universe_id);
@@ -47,4 +47,4 @@ class CharacterRepository {
   }
 }
 
-export default CharacterRepository;
+module.exports = CharacterRepository;

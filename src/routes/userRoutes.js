@@ -1,14 +1,17 @@
-import { addUser } from './repositories/userRepository';
+const UserRepository = require('../repositories/userRepository');
+userRepository = new UserRepository();
+const { Router } = require('express');
+const router = Router();
 
 // Création d'un nouvel utilisateur
-app.post('/users', (req, res) => {
+router.post('/users', (req, res) => {
   const newUser = {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password
   };
 
-  addUser(newUser)
+  userRepository.addUser(newUser)
     .then(user => {
       res.status(201).json(user);
     })
@@ -20,7 +23,7 @@ app.post('/users', (req, res) => {
 
 
 // Modification d'un utilisateur | Vérification du token
-app.put('/users/:x', (req, res) => {
+router.put('/users/:x', (req, res) => {
   const userId = req.params.x;
   const userData = req.body; // Données de l'utilisateur à mettre à jour
 
@@ -37,7 +40,7 @@ app.put('/users/:x', (req, res) => {
 });
 
 // Récupération d'un utilisateur
-app.get('/users/:x', (req, res) => {
+router.get('/users/:x', (req, res) => {
   const userId = req.params.x;
 
   // Appel de la fonction getUserById du userRepository
@@ -58,7 +61,7 @@ app.get('/users/:x', (req, res) => {
 });
 
 // Récupération de l'ensemble des utilisateurs
-app.get('/users', (req, res) => {
+router.get('/users', (req, res) => {
   // Appel de la fonction getAllUsers du userRepository
   userRepository.getAllUsers()
     .then(users => {
@@ -69,3 +72,5 @@ app.get('/users', (req, res) => {
       res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
     });
 });
+
+module.exports = router;

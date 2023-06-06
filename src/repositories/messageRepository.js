@@ -1,14 +1,17 @@
-import { query } from '../config/database';
-import Message from '../entities/Message';
+const db = require('../db');
+const Message = require('../entities/Message');
+const conversationRepositoryclass = require('./conversationRepository');
+
+const conversationRepository = new conversationRepositoryclass();
 
 class MessageRepository {
   getAllMessages() {
-    return query('SELECT * FROM message')
+    return db.query('SELECT * FROM message')
       .then(rows => rows.map(row => new Message(row.id, row.content, row.timestamp)));
   }
 
   getMessageById(id) {
-    return query('SELECT * FROM message WHERE id = ?', [id])
+    return db.query('SELECT * FROM message WHERE id = ?', [id])
       .then(rows => {
         if (rows.length > 0) {
           const { id, content, timestamp } = rows[0];
@@ -19,7 +22,7 @@ class MessageRepository {
   }
 
   addMessage(message) {
-    return query('INSERT INTO message (content, timestamp) VALUES (?, ?)', [message.content, message.timestamp])
+    return db.query('INSERT INTO message (content, timestamp) VALUES (?, ?)', [message.content, message.timestamp])
       .then(result => {
         const { insertId } = result;
         return new Message(insertId, message.content, message.timestamp);
@@ -27,7 +30,7 @@ class MessageRepository {
   }
 
   updateMessage(message) {
-    return query('UPDATE message SET content = ?, timestamp = ? WHERE id = ?', [message.content, message.timestamp, message.id])
+    return db.query('UPDATE message SET content = ?, timestamp = ? WHERE id = ?', [message.content, message.timestamp, message.id])
       .then(result => {
         if (result.affectedRows > 0) {
           return message;
@@ -63,7 +66,7 @@ class MessageRepository {
   
 
   deleteMessage(id) {
-    return query('DELETE FROM message WHERE id = ?', [id])
+    return db.query('DELETE FROM message WHERE id = ?', [id])
       .then(result => {
         if (result.affectedRows > 0) {
           return id;
@@ -73,4 +76,4 @@ class MessageRepository {
   }
 }
 
-export default MessageRepository;
+module.exports = MessageRepository;

@@ -1,14 +1,14 @@
-import { query } from '../config/database';
-import Conversation from '../entities/Conversation';
+const db = require('../db');
+const Conversation = require('../entities/Conversation');
 
 class ConversationRepository {
   getAllConversations() {
-    return query('SELECT * FROM conversation')
+    return db.query('SELECT * FROM conversation')
       .then(rows => rows.map(row => new Conversation(row.id, row.title, row.description)));
   }
 
   getConversationById(id) {
-    return query('SELECT * FROM conversation WHERE id = ?', [id])
+    return db.query('SELECT * FROM conversation WHERE id = ?', [id])
       .then(rows => {
         if (rows.length > 0) {
           const { id, title, description } = rows[0];
@@ -40,7 +40,7 @@ class ConversationRepository {
                     'JOIN universe ON character.universe_id = universe.id ' +
                     'WHERE conversation.id = ?';
   
-      connection.query(query, [conversationId], (error, results) => {
+                    db.query(query, [conversationId], (error, results) => {
         if (error) {
           reject(error);
         } else {
@@ -65,7 +65,7 @@ class ConversationRepository {
   }
 
   addConversation(conversation) {
-    return query('INSERT INTO conversation (title, description) VALUES (?, ?)', [conversation.title, conversation.description])
+    return db.query('INSERT INTO conversation (title, description) VALUES (?, ?)', [conversation.title, conversation.description])
       .then(result => {
         const { insertId } = result;
         return new Conversation(insertId, conversation.title, conversation.description);
@@ -73,7 +73,7 @@ class ConversationRepository {
   }
 
   updateConversation(conversation) {
-    return query('UPDATE conversation SET title = ?, description = ? WHERE id = ?', [conversation.title, conversation.description, conversation.id])
+    return db.query('UPDATE conversation SET title = ?, description = ? WHERE id = ?', [conversation.title, conversation.description, conversation.id])
       .then(result => {
         if (result.affectedRows > 0) {
           return conversation;
@@ -83,7 +83,7 @@ class ConversationRepository {
   }
 
   deleteConversation(id) {
-    return query('DELETE FROM conversation WHERE id = ?', [id])
+    return db.query('DELETE FROM conversation WHERE id = ?', [id])
       .then(result => {
         if (result.affectedRows > 0) {
           return id;
@@ -93,4 +93,4 @@ class ConversationRepository {
   }
 }
 
-export default ConversationRepository;
+module.exports = ConversationRepository;

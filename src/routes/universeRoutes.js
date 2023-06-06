@@ -1,7 +1,11 @@
-import { getAllUniverses } from './repositories/universeRepository';
+const ConversationRepository = require('../repositories/conversationRepository');
+const UniverseRepository = require('../repositories/universeRepository');
+universeRepository = new UniverseRepository();
+const { Router } = require('express');
+const router = Router();
 
 // Récupération de l'ensemble des univers
-app.get('/universes', (req, res) => {
+router.get('/universes', (req, res) => {
   // Appel de la fonction getAllUniverses du universeRepository
   universeRepository.getAllUniverses()
     .then(universes => {
@@ -14,7 +18,7 @@ app.get('/universes', (req, res) => {
 });
 
   // Création d'un univers
-  app.post('/universes', (req, res) => {
+  router.post('/universes', (req, res) => {
     const { name, description } = req.body;
   
     // Appel de la fonction addUniverse du universeRepository
@@ -29,7 +33,7 @@ app.get('/universes', (req, res) => {
   });
   
   // Récupération d'un univers
-  app.get('/universes/:x', (req, res) => {
+  router.get('/universes/:x', (req, res) => {
     const universeId = req.params.x;
   
     // Appeler la fonction getUniverseById du service univers
@@ -45,7 +49,7 @@ app.get('/universes', (req, res) => {
   });
   
   // Modification d'un univers
-  app.put('/universes/:x', (req, res) => {
+  router.put('/universes/:x', (req, res) => {
     const universeId = req.params.x;
     const updatedUniverse = req.body;
   
@@ -62,7 +66,7 @@ app.get('/universes', (req, res) => {
   });
 
   //Suppression d'un univers
-  app.delete('/universes/:x', (req, res) => {
+  router.delete('/universes/:x', (req, res) => {
     const universeId = req.params.x;
   
     // Appeler la fonction deleteUniverse du service univers
@@ -78,7 +82,7 @@ app.get('/universes', (req, res) => {
   });
   
   // Suppression d'un univers et de tous les personnages associés
-  app.delete('/universes/:x', (req, res) => {
+  router.delete('/universes/:x', (req, res) => {
     const universeId = req.params.x;
   
     universeRepository.deleteUniverseAndCharacters(universeId)
@@ -95,7 +99,7 @@ app.get('/universes', (req, res) => {
   });
   
   // Récupération de l'ensemble des personnages d'un univers
-  app.get('/universes/:x/characters', (req, res) => {
+  router.get('/universes/:x/characters', (req, res) => {
     const universeId = req.params.x;
   
     universeRepository.getCharactersByUniverse(universeId)
@@ -109,7 +113,7 @@ app.get('/universes', (req, res) => {
   });
   
   // Création d'un personnage dans un univers
-  app.post('/universes/:x/characters', (req, res) => {
+  router.post('/universes/:x/characters', (req, res) => {
     const universeId = req.params.x;
     const character = req.body;
   
@@ -124,7 +128,7 @@ app.get('/universes', (req, res) => {
   });
   
   // Modification d'un personnage dans un univers
-  app.put('/universes/:x/characters/:characterId', (req, res) => {
+  router.put('/universes/:x/characters/:characterId', (req, res) => {
     const universeId = req.params.x;
     const characterId = req.params.characterId;
     const updatedCharacter = req.body;
@@ -140,7 +144,7 @@ app.get('/universes', (req, res) => {
   });  
   
   // Suppression d'un personnage dans un univers
-  app.delete('/universes/:x/characters/:characterId', (req, res) => {
+  router.delete('/universes/:x/characters/:characterId', (req, res) => {
     const universeId = req.params.x;
     const characterId = req.params.characterId;
   
@@ -154,3 +158,4 @@ app.get('/universes', (req, res) => {
       });
   });
   
+  module.exports = router;

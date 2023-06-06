@@ -9,5 +9,5 @@ class Character {
     }
   }
   
-  export default Character;
+  module.exports = Character;
   

@@ -8,5 +8,5 @@ class Conversation {
     }
   }
   
-  export default Conversation;
+  module.exports = Conversation;
   

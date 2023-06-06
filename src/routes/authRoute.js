@@ -1,7 +1,11 @@
 // Identification afin de récupérer un token JWT
-import { sign } from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
+const { sign } = require('jsonwebtoken');
+const { Router } = require('express');
+const router = Router();
 
-app.post('/auth', (req, res) => {
+
+router.post('/auth', (req, res) => {
   // Récupérer les informations d'identification depuis le corps de la requête
   const { username, password } = req.body;
 
@@ -22,3 +26,5 @@ app.post('/auth', (req, res) => {
     res.status(401).json({ error: 'Identifiants invalides' });
   }
 });
+
+module.exports = router;

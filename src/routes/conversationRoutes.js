@@ -1,5 +1,11 @@
+const ConversationRepository = require('../repositories/conversationRepository');
+const MessageRepository = require('../repositories/messageRepository');
+conversationRepository = new ConversationRepository();
+const { Router } = require('express');
+const router = Router();
+
 // Récupération des conversations en cours qui renvoie aussi l'ID du personnage et de l'univers
-app.get('/conversations', (req, res) => {
+router.get('/conversations', (req, res) => {
   conversationRepository.getAllConversations()
     .then(conversations => {
       const formattedConversations = conversations.map(conversation => {
@@ -18,7 +24,7 @@ app.get('/conversations', (req, res) => {
 });
   
   // Création d'une nouvelle conversation avec un personnage
-  app.post('/conversations', (req, res) => {
+  router.post('/conversations', (req, res) => {
     const { characterId } = req.body; // ID du personnage
     const conversation = {
       characterId,
@@ -37,7 +43,7 @@ app.get('/conversations', (req, res) => {
   
   
   // Récupération d'une conversation avec le personnage et l'univers complet
-  app.get('/conversations/:id', (req, res) => {
+  router.get('/conversations/:id', (req, res) => {
     const conversationId = req.params.id;
   
     conversationRepository.getConversationWithCharacterAndUniverse(conversationId)
@@ -56,7 +62,7 @@ app.get('/conversations', (req, res) => {
   
   
   // Suppression d'une conversation avec un personnage
-  app.delete('/conversations/:x', (req, res) => {
+  router.delete('/conversations/:x', (req, res) => {
     const conversationId = req.params.x;
   
     conversationRepository.deleteConversation(conversationId)
@@ -75,7 +81,7 @@ app.get('/conversations', (req, res) => {
   
   
   // Récupération de l'historique des messages d'une conversation
-  app.get('/conversations/:x/messages', (req, res) => {
+  router.get('/conversations/:x/messages', (req, res) => {
     const conversationId = req.params.x;
   
     conversationRepository.getMessagesByConversation(conversationId)
@@ -89,7 +95,7 @@ app.get('/conversations', (req, res) => {
   });  
   
   // Envoi d'un nouveau message dans la conversation
-  app.post('/conversations/:x/messages', (req, res) => {
+  router.post('/conversations/:x/messages', (req, res) => {
     const conversationId = req.params.x;
     const { content, senderId } = req.body;
   
@@ -110,7 +116,7 @@ app.get('/conversations', (req, res) => {
   });  
   
   // Regénération du dernier message d'une conversation
-  app.put('/conversations/:conversationId', (req, res) => {
+  router.put('/conversations/:conversationId', (req, res) => {
     const conversationId = req.params.conversationId;
   
     // Logique pour la régénération du dernier message d'une conversation
@@ -123,3 +129,4 @@ app.get('/conversations', (req, res) => {
     }
   });
   
+  module.exports = router;
