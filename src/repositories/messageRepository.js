@@ -36,6 +36,32 @@ class MessageRepository {
       });
   }
 
+    regenerateLastMessage(conversationId) {
+    // 1. Récupérer la conversation à partir de son ID
+    const conversation = conversationRepository.getConversationById(conversationId);
+  
+    if (!conversation) {
+      return null; // La conversation n'existe pas
+    }
+  
+    // 2. Récupérer le dernier message de la conversation
+    const lastMessage = messageRepository.getLastMessageByConversation(conversationId);
+  
+    if (!lastMessage) {
+      return null; // Aucun message dans la conversation
+    }
+  
+    // 3. Régénérer le dernier message à l'aide d'OpenAI
+    const regeneratedMessage = openAI.generateMessage(lastMessage.text);
+  
+    // 4. Mettre à jour le texte du dernier message dans la base de données
+    messageRepository.updateMessageText(lastMessage.id, regeneratedMessage);
+  
+    // 5. Retourner le message régénéré
+    return regeneratedMessage;
+  }
+  
+
   deleteMessage(id) {
     return query('DELETE FROM message WHERE id = ?', [id])
       .then(result => {

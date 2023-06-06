@@ -18,6 +18,16 @@ class UniverseRepository {
       });
   }
 
+  getCharactersByUniverse(universeId) {
+    return query('SELECT * FROM character WHERE universe_id = ?', [universeId])
+      .then(rows => {
+        return rows;
+      })
+      .catch(error => {
+        throw error;
+      });
+  }
+
   addUniverse(universe) {
     return query('INSERT INTO universe (name, description) VALUES (?, ?)', [universe.name, universe.description])
       .then(result => {
@@ -45,6 +55,28 @@ class UniverseRepository {
         return null;
       });
   }
+
+  deleteUniverseAndCharacters(universeId) {
+    return new Promise((resolve, reject) => {
+      // Supprimer les personnages associés à l'univers
+      query('DELETE FROM character WHERE universeId = ?', [universeId])
+        .then(() => {
+          // Supprimer l'univers lui-même
+          return query('DELETE FROM universe WHERE id = ?', [universeId]);
+        })
+        .then(result => {
+          if (result.affectedRows > 0) {
+            resolve(true); // La suppression a réussi
+          } else {
+            resolve(false); // Aucun univers n'a été supprimé
+          }
+        })
+        .catch(error => {
+          reject(error); // Une erreur s'est produite lors de la suppression
+        });
+    });
+  }
+  
 }
 
 export default UniverseRepository;

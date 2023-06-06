@@ -19,10 +19,10 @@ class CharacterRepository {
   }
 
   addCharacter(character) {
-    return query('INSERT INTO character (name, description) VALUES (?, ?)', [character.name, character.description])
+    return query('INSERT INTO character (name, description, universe_id) VALUES (?, ?)', [character.name, character.description])
       .then(result => {
         const { insertId } = result;
-        return new Character(insertId, character.name, character.description);
+        return new Character(insertId, character.name, character.description, character.universe_id);
       });
   }
 
