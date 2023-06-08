@@ -3,45 +3,24 @@ userRepository = new UserRepository();
 const { Router } = require('express');
 const router = Router();
 
-// Création d'un nouvel utilisateur
-router.post('/', (req, res) => {
-  const newUser = {
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password
-  };
+// Récupération de l'ensemble des utilisateurs
+router.get('/', (req, res) => {
 
-  userRepository.addUser(newUser)
-    .then(user => {
-      res.status(201).json(user);
+  // Appel de la fonction getAllUsers du userRepository
+  userRepository.getAllUsers()
+    .then(users => {
+      res.json(users);
     })
     .catch(error => {
-      console.error('Error creating user:', error);
-      res.status(500).json({ error: 'Failed to create user' });
-    });
+      // Gestion des erreurs lors de la récupération des utilisateurs
+      res.status(500).json({ error: 'Failed to get users' });
+    }); 
 });
 
-
-// Modification d'un utilisateur | Vérification du token
-router.put('/:x', (req, res) => {
-  const userId = req.params.x;
-  const userData = req.body; // Données de l'utilisateur à mettre à jour
-
-  // Appel de la fonction updateUser du userRepository
-  userRepository.updateUser(userId, userData)
-    .then(updatedUser => {
-      // Utilisateur mis à jour avec succès
-      res.json(updatedUser);
-    })
-    .catch(error => {
-      // Gestion des erreurs lors de la mise à jour de l'utilisateur
-      res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur' });
-    });
-});
 
 // Récupération d'un utilisateur
-router.get('/:x', (req, res) => {
-  const userId = req.params.x;
+router.get('/:id', (req, res) => {
+  const userId = req.params.id;
 
   // Appel de la fonction getUserById du userRepository
   userRepository.getUserById(userId)
@@ -60,17 +39,85 @@ router.get('/:x', (req, res) => {
     });
 });
 
-// Récupération de l'ensemble des utilisateurs
-router.get('/', (req, res) => {
-  // Appel de la fonction getAllUsers du userRepository
-  userRepository.getAllUsers()
-    .then(users => {
-      res.json(users);
+// Création d'un nouvel utilisateur
+router.post('/', (req, res) => {
+
+  console.log(res.data);
+
+  const newUser = {
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  userRepository.addUser(newUser)
+    .then(userId => {
+      // Récupération de l'utilisateur créé en utilisant l'ID retourné
+      return userRepository.getUserById(userId);
+    })
+    .then(user => {
+      res.status(201).json(user);
     })
     .catch(error => {
-      // Gestion des erreurs lors de la récupération des utilisateurs
-      res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
+      console.error('Error pour créer l\'utilisateur:', error);
+      res.status(500).json({ error: 'Erreur dans la création de l\'utilisateur' });
     });
 });
+
+
+// Modification d'un utilisateur | Vérification du token
+router.put('/:id', (req, res) => {
+  
+  const updateData = {
+    id: req.params.id,
+    username: req.body.username,
+    email: req.body.email,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname
+  };
+
+  userRepository.getUserById(req.params.id) // Vérifier si l'utilisateur existe avant la mise à jour
+    .then(existingUser => {
+      if (existingUser) {
+        return userRepository.updateUser(updateData);
+      } else {
+        throw new Error('Utilisateur non trouvé'); // Lancer une erreur personnalisée
+      }
+    })
+    .then(updatedUser => {
+      res.json(updatedUser);
+    })
+    .catch(error => {
+      console.error('Erreur lors de la mise à jour de l\'utilisateur :', error);
+      if (error.message === 'Utilisateur non trouvé') {
+        res.status(404).json({ error: 'Utilisateur non trouvé' });
+      } else {
+        res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur' });
+      }
+    });
+});
+
+// Suppression d'un utilisateur
+router.delete('/:x', (req, res) => {
+  const userId = req.params.x;
+  console.log(userId);
+  userRepository.deleteUser(userId)
+    .then(result => {
+      if (result) {
+        res.json({ message: 'Utilisateur supprimé avec succès' });
+      } else {
+        res.status(404).json({ error: 'Utilisateur non trouvé'});
+      }
+    })
+    .catch(error => {
+      console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+      res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur' });
+    });
+});
+
 
 module.exports = router;

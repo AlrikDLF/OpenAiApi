@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const authMiddleware = require('./middleware/authentification');
 
 // Middleware global d'authentification pour toutes les routes
-app.use(authMiddleware);
+//app.use(authMiddleware);
 
 // Importer les fichiers des routes des utilisateurs
 const userRepository = require('./repositories/userRepository');
@@ -15,11 +15,18 @@ const universeRepository = require('./repositories/universeRepository');
 const userRoutes = require('./routes/userRoutes');
 const conversationRoutes = require('./routes/conversationRoutes');
 const universeRoutes = require('./routes/universeRoutes');
+const characterRoutes = require('./routes/characterRoutes');
+
+// Middleware global pour parser les requêtes en JSON
+const express = require('express');
+
 
 // Charger les routes 
+app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/conversations', conversationRoutes);
 app.use('/universes', universeRoutes);
+app.use('/characters', characterRoutes);
 
 // Démarrer le serveur sur le port 3000
 app.listen(3000, () => {

@@ -2,48 +2,123 @@ const db = require('../db');
 const Character = require('../entities/Character');
 
 class CharacterRepository {
-  getAllCharacters() {
-    return query('SELECT * FROM character')
-      .then(rows => rows.map(row => new Character(row.id, row.name, row.description)));
-  }
 
-  getCharacterById(id) {
-    return query('SELECT * FROM character WHERE id = ?', [id])
-      .then(rows => {
-        if (rows.length > 0) {
-          const { id, name, description } = rows[0];
-          return new Character(id, name, description);
-        }
+  //getAllCharacters
+  async getAllCharacters() {
+    try {
+      const rows = await new Promise((resolve, reject) => {
+        db.query('SELECT * FROM character', (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        });
+      });
+
+      console.log(rows);
+  
+      if (rows.length > 0) {
+        const characters = rows.map(row => new Character(row.id, row.name, row.description, row.user_id, row.universe_id, row.createdAt, row.updatedAt));
+        return characters;
+      } else {
         return null;
-      });
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la récupération des characters :', error);
+      return null;
+    }
   }
 
-  addCharacter(character) {
-    return query('INSERT INTO character (name, description, universe_id) VALUES (?, ?)', [character.name, character.description, character.universe_id])
-      .then(result => {
-        const { insertId } = result;
-        return new Character(insertId, character.name, character.description, character.universe_id);
+  //getCharacterById
+  async getCharacterById(id) {
+    try {
+      const rows = await new Promise((resolve, reject) => {
+        db.query('SELECT * FROM character WHERE id = ?', [id], (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        });
       });
-  }
-
-  updateCharacter(character) {
-    return query('UPDATE character SET name = ?, description = ? WHERE id = ?', [character.name, character.description, character.id])
-      .then(result => {
-        if (result.affectedRows > 0) {
-          return character;
-        }
+  
+      if (rows.length > 0) {
+        const { id, name, description, createdAt, updatedAt } = rows[0];
+        return new Character(id, name, description, createdAt, updatedAt);
+      } else {
         return null;
-      });
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la récupération du character :', error);
+      return null;
+    }
   }
 
-  deleteCharacter(id) {
-    return query('DELETE FROM character WHERE id = ?', [id])
-      .then(result => {
-        if (result.affectedRows > 0) {
-          return id;
-        }
-        return null;
+  //addCharacter
+  async addCharacter(character) {
+    try {
+      const result = await new Promise((resolve, reject) => {
+        db.query('INSERT INTO character (name, description, universe_id)VALUES (?, ?, ?)',
+          [character.name, character.description, character.universe_id, character.createdAt, character.updatedAt],
+          (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          }
+        );
       });
+  
+      if (result.affectedRows > 0) {
+        return result.insertId;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de l\'ajout du character :', error);
+      return null;
+    }
+  }  
+
+  //updateCharacter
+  async updateCharacter(character) {
+    try {
+      const result = await new Promise((resolve, reject) => {
+        db.query('UPDATE character SET name = ?, description = ?, user_id = ?, universe_id = ?, updatedAt = NOW() WHERE id = ?',
+        [character.name, character.description, character.universe_id, character.createdAt, character.updatedAt, character.id],
+          (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          }
+        );
+      });
+      if (result.affectedRows > 0) {
+        return character;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la mise à jour du character :', error);
+      return null;
+    }
+  }  
+
+  //deleteCharacter
+  async deleteCharacter(character) {
+    try {
+        console.log(character);
+      const result = await new Promise((resolve, reject) => {
+        db.query('DELETE FROM character WHERE id = ?',
+          [character],
+          (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          }
+        );
+      });
+  
+      if (result.affectedRows > 0) {
+        return true; // La suppression du character a réussi
+      } else {
+        return false; // Aucun character trouvé avec cet ID
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la suppression du character :', error);
+      return false; // Erreur lors de la suppression
+    }
   }
 }
 

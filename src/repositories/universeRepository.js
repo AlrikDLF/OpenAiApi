@@ -3,10 +3,29 @@ const Universe = require('../entities/Universe');
 
 
 class UniverseRepository {
-  getAllUniverses() {
-    return db.query('SELECT * FROM universe')
-      .then(rows => rows.map(row => new Universe(row.id, row.name, row.description)));
+  async getAllUniverses() {
+    try {
+      const rows = await new Promise((resolve, reject) => {
+        db.query('SELECT * FROM universe', (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        });
+      });
+  
+      if (rows.length > 0) {
+        const universes = rows.map(row => new Universe(row.id, row.name, row.description));
+        console.log(universes);
+        return universes;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la récupération des utilisateurs :', error);
+      return null;
+    }
   }
+
+  //TO CHECK :
 
   getUniverseById(id) {
     return db.query('SELECT * FROM universe WHERE id = ?', [id])
