@@ -53,7 +53,7 @@ class CharacterRepository {
   async addCharacter(character) {
     try {
       const result = await new Promise((resolve, reject) => {
-        db.query('INSERT INTO `character` (name, description, universe_id)VALUES (?, ?, ?)',
+        db.query('INSERT INTO `character` (name, description, universe_id, createdAt, updatedAt)VALUES (?, ?, ?, ?, ?)',
           [character.name, character.description, character.universe_id, character.createdAt, character.updatedAt],
           (err, result) => {
             if (err) reject(err);
@@ -81,7 +81,7 @@ class CharacterRepository {
         [character.name, character.description, character.universe_id, character.id],
           (err, result) => {
             if (err) reject(err);
-            resolve(result);
+            resolve(result); 
           }
         );
       });
