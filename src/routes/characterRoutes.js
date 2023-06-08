@@ -2,18 +2,19 @@ const CharacterRepository = require('../repositories/characterRepository');
 characterRepository = new CharacterRepository();
 const { Router } = require('express');
 const router = Router();
+const sendMessage = require('../app');
 
 // Récupération de l'ensemble des characters
 router.get('/', (req, res) => {
 
   // Appel de la fonction getAllCharacters du characterRepository
   characterRepository.getAllCharacters()
-    .then(Characters => {
-      res.json(Characters);
+    .then(Character => {
+      res.json(Character);
     })
     .catch(error => {
       // Gestion des erreurs lors de la récupération des characters
-      res.status(500).json({ error: 'Failed to get Characters' });
+      res.status(500).json({ error: 'Erreur dans la récupération des characte' });
     }); 
 });
 
@@ -44,24 +45,25 @@ router.post('/', (req, res) => {
 
   const newCharacter = {
     name: req.body.name,
-    description: req.body.description,
+    description: "",
     universe_id: req.body.universe_id,
     createdAt: new Date(),
     updatedAt: new Date()
   };
 
+  sendMessage("Coucou, décris moi l'histoire de " + newCharacter.name + " de l'univers " + get + " stp");
+
   characterRepository.addCharacter(newCharacter)
-    .then(CharacterId => {
-      // Récupération du character créé en utilisant l'ID retourné
-      return CharacterRepository.getCharacterById(CharacterId);
-    })
-    .then(Character => {
-      res.status(201).json(Character);
-    })
+  // Check if the character has been created
+    .then(createdCharacter => {
+      res.json(createdCharacter);
+    }
+    )
     .catch(error => {
-      console.error('Error pour créer le character:', error);
-      res.status(500).json({ error: 'Erreur dans la création du character' });
-    });
+      console.error('Erreur lors de la création du character :', error);
+      res.status(500).json({ error: 'Erreur lors de la création du character' });
+    }
+    );
 });
 
 
