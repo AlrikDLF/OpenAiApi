@@ -42,8 +42,6 @@ router.get('/:id', (req, res) => {
 // Création d'un nouveau character
 router.post('/', (req, res) => {
 
-  console.log(res.data);
-
   const newCharacter = {
     name: req.body.name,
     description: req.body.description,
