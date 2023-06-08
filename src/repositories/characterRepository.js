@@ -7,7 +7,7 @@ class CharacterRepository {
   async getAllCharacters() {
     try {
       const rows = await new Promise((resolve, reject) => {
-        db.query('SELECT * FROM character', (err, rows) => {
+        db.query('SELECT * FROM `character`', (err, rows) => {
           if (err) reject(err);
           resolve(rows);
         });
@@ -16,7 +16,7 @@ class CharacterRepository {
       console.log(rows);
   
       if (rows.length > 0) {
-        const characters = rows.map(row => new Character(row.id, row.name, row.description, row.user_id, row.universe_id, row.createdAt, row.updatedAt));
+        const characters = rows.map(row => new Character(row.id, row.name, row.description, row.universe_id, row.createdAt, row.updatedAt));
         return characters;
       } else {
         return null;
@@ -31,7 +31,7 @@ class CharacterRepository {
   async getCharacterById(id) {
     try {
       const rows = await new Promise((resolve, reject) => {
-        db.query('SELECT * FROM character WHERE id = ?', [id], (err, rows) => {
+        db.query('SELECT * FROM `character` WHERE id = ?', [id], (err, rows) => {
           if (err) reject(err);
           resolve(rows);
         });
@@ -53,7 +53,7 @@ class CharacterRepository {
   async addCharacter(character) {
     try {
       const result = await new Promise((resolve, reject) => {
-        db.query('INSERT INTO character (name, description, universe_id)VALUES (?, ?, ?)',
+        db.query('INSERT INTO `character` (name, description, universe_id)VALUES (?, ?, ?)',
           [character.name, character.description, character.universe_id, character.createdAt, character.updatedAt],
           (err, result) => {
             if (err) reject(err);
@@ -77,8 +77,8 @@ class CharacterRepository {
   async updateCharacter(character) {
     try {
       const result = await new Promise((resolve, reject) => {
-        db.query('UPDATE character SET name = ?, description = ?, user_id = ?, universe_id = ?, updatedAt = NOW() WHERE id = ?',
-        [character.name, character.description, character.universe_id, character.createdAt, character.updatedAt, character.id],
+        db.query('UPDATE `character` SET name = ?, description = ?, universe_id = ?, updatedAt = NOW() WHERE id = ?',
+        [character.name, character.description, character.universe_id, character.id],
           (err, result) => {
             if (err) reject(err);
             resolve(result);
@@ -101,7 +101,7 @@ class CharacterRepository {
     try {
         console.log(character);
       const result = await new Promise((resolve, reject) => {
-        db.query('DELETE FROM character WHERE id = ?',
+        db.query('DELETE FROM `character` WHERE id = ?',
           [character],
           (err, result) => {
             if (err) reject(err);

@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
 });
 
 
-// Récupération d'un character
+// Récupération d'un character par l'id
 router.get('/:id', (req, res) => {
   const CharacterId = req.params.id;
 
@@ -46,10 +46,8 @@ router.post('/', (req, res) => {
 
   const newCharacter = {
     name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
+    description: req.body.description,
+    universe_id: req.body.universe_id,
     createdAt: new Date(),
     updatedAt: new Date()
   };
@@ -75,9 +73,8 @@ router.put('/:id', (req, res) => {
   const updateData = {
     id: req.params.id,
     name: req.body.name,
-    email: req.body.email,
-    firstname: req.body.firstname,
-    lastname: req.body.lastname
+    description: req.body.description,
+    universe_id: req.body.universe_id
   };
 
   characterRepository.getCharacterById(req.params.id) // Vérifier si le character existe avant la mise à jour
