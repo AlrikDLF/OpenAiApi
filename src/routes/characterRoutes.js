@@ -51,7 +51,7 @@ router.post('/', (req, res) => {
     updatedAt: new Date()
   };
 
-  sendMessage("Coucou, décris moi l'histoire de " + newCharacter.name + " de l'univers " + get + " stp");
+  sendMessage("Coucou, décris moi l'histoire de " + newCharacter.name + " de l'univers " + universeRepository.getUniverseById + " ");
 
   characterRepository.addCharacter(newCharacter)
   // Check if the character has been created

@@ -25,18 +25,29 @@ class UniverseRepository {
     }
   }
 
-  //TO CHECK :
-
-  getUniverseById(id) {
-    return db.query('SELECT * FROM universe WHERE id = ?', [id])
-      .then(rows => {
-        if (rows.length > 0) {
-          const { id, name, description } = rows[0];
-          return new Universe(id, name, description);
-        }
-        return null;
+  //getUniverseById
+  async getUniverseById(id) {
+    try {
+      const rows = await new Promise((resolve, reject) => {
+        db.query('SELECT * FROM universe WHERE id = ?', [id], (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        });
       });
+  
+      if (rows.length > 0) {
+        const { id, name, description, creator_id, createdAt, updatedAt } = rows[0];
+        return new Universe(id, name, description, creator_id, createdAt, updatedAt);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la récupération de l\'univers :', error);
+      return null;
+    }
   }
+
+  //TO CHECK :
 
   getCharactersByUniverse(universeId) {
     return db.query('SELECT * FROM character WHERE universe_id = ?', [universeId])
@@ -48,13 +59,29 @@ class UniverseRepository {
       });
   }
 
-  addUniverse(universe) {
-    return db.query('INSERT INTO universe (name, description) VALUES (?, ?)', [universe.name, universe.description])
-      .then(result => {
-        const { insertId } = result;
-        return new Universe(insertId, universe.name, universe.description);
+  //addUniverse
+  async addUniverse(universe) {
+    try {
+      const result = await new Promise((resolve, reject) => {
+        db.query('INSERT INTO universe (name, description) VALUES (?, ?)',
+          [universe.name, universe.description, universe.createdAt, universe.updatedAt],
+          (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          }
+        );
       });
-  }
+  
+      if (result.affectedRows > 0) {
+        return result.insertId;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de l\'ajout de l\'univers :', error);
+      return null;
+    }
+  }  
 
   updateUniverse(universe) {
     return db.query('UPDATE universe SET name = ?, description = ? WHERE id = ?', [universe.name, universe.description, universe.id])
@@ -66,15 +93,55 @@ class UniverseRepository {
       });
   }
 
-  deleteUniverse(id) {
-    return db.query('DELETE FROM universe WHERE id = ?', [id])
-      .then(result => {
-        if (result.affectedRows > 0) {
-          return id;
-        }
-        return null;
+  //updateUniverse
+  async updateUniverse(universe) {
+    try {
+      const result = await new Promise((resolve, reject) => {
+        db.query('UPDATE universe SET name = ?, description = ?, updatedAt = NOW() WHERE id = ?',
+          [universe.name, universe.description, universe.id],
+          (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          }
+        );
       });
-  }
+      if (result.affectedRows > 0) {
+        return universe;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la mise à jour de l\'univers :', error);
+      return null;
+    }
+  }  
+
+  //deleteUniverse
+  async deleteUniverse(universe) {
+    try {
+        console.log(user);
+      const result = await new Promise((resolve, reject) => {
+        db.query('DELETE FROM universe WHERE id = ?',
+          [universe],
+          (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          }
+        );
+      });
+  
+      if (result.affectedRows > 0) {
+        return true; // La suppression a réussi
+      } else {
+        return false; // Aucun univers trouvé avec cet ID
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la suppression de l\'univers :', error);
+      return false; // Erreur lors de la suppression
+    }
+  }  
+
+  //--------------------
 
   deleteUniverseAndCharacters(universeId) {
     return new Promise((resolve, reject) => {
@@ -96,7 +163,33 @@ class UniverseRepository {
         });
     });
   }
+
+  //TO CHECK AND MODIFY :
+
+  //deleteUniverseAndCharacters
+  async deleteUniverseAndCharacters(universe) {
+    try {
+        console.log(universe);
+      const result = await new Promise((resolve, reject) => {
+        db.query('DELETE FROM universe WHERE id = ?',
+          [universe],
+          (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          }
+        );
+      });
   
+      if (result.affectedRows > 0) {
+        return true; // La suppression a réussi
+      } else {
+        return false; // Aucun univers trouvé avec cet ID
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite lors de la suppression de l\'univers :', error);
+      return false; // Erreur lors de la suppression
+    }
+  }  
 }
 
 module.exports = UniverseRepository;
