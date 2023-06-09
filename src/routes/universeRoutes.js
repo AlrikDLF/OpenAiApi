@@ -17,53 +17,76 @@ router.get('/', (req, res) => {
     });
 });
 
-  // Création d'un univers
-  router.post('/', (req, res) => {
-    const { name, description } = req.body;
+
+// Récupération d'un univers avec l'Id
+router.get('/:x', (req, res) => {
+  const universeId = req.params.x;
   
-    // Appel de la fonction addUniverse du universeRepository
-    universeRepository.addUniverse(name, description)
-      .then(createdUniverse => {
-        res.status(201).json(createdUniverse);
-      })
-      .catch(error => {
-        // Gestion des erreurs lors de la création de l'univers
-        res.status(500).json({ error: 'Erreur lors de la création de l\'univers' });
-      });
+  // Appeler la fonction getUniverseById du service univers
+  universeRepository.getUniverseById(universeId)
+  .then((universe) => {
+    // Envoyer la réponse avec l'univers récupéré
+    res.json(universe);
+  })
+  .catch((error) => {
+    // Gérer les erreurs
+    res.status(500).json({ error: 'Une erreur est survenue lors de la récupération de l\'univers.' });
   });
+});
+
+// Création d'un univers
+router.post('/', (req, res) => {
   
-  // Récupération d'un univers
-  router.get('/:x', (req, res) => {
-    const universeId = req.params.x;
+  const newUniverse = {
+    name: req.body.name,
+    description: req.body.description,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  universeRepository.addUniverse(newUniverse)
+    .then(universeId => {
+      // Récupération de l'univers créé en utilisant l'ID retourné
+      return universeRepository.getUniverseById(universeId);
+    })
+    .then(universe => {
+      res.status(201).json(universe);
+    })
+    .catch(error => {
+      console.error('Error pour créer l\'univers:', error);
+      res.status(500).json({ error: 'Erreur dans la création de l\'univers' });
+    });
+});
+
+// Modification d'un univers
+router.put('/:id', (req, res) => {
   
-    // Appeler la fonction getUniverseById du service univers
-    universeRepository.getUniverseById(universeId)
-      .then((universe) => {
-        // Envoyer la réponse avec l'univers récupéré
-        res.json(universe);
-      })
-      .catch((error) => {
-        // Gérer les erreurs
-        res.status(500).json({ error: 'Une erreur est survenue lors de la récupération de l\'univers.' });
-      });
-  });
-  
-  // Modification d'un univers
-  router.put('/:x', (req, res) => {
-    const universeId = req.params.x;
-    const updatedUniverse = req.body;
-  
-    // Appeler la fonction updateUniverse du service univers
-    universeRepository.updateUniverse(universeId, updatedUniverse)
-      .then((updatedUniverse) => {
-        // Envoyer la réponse avec l'univers modifié
-        res.json(updatedUniverse);
-      })
-      .catch((error) => {
-        // Gérer les erreurs
-        res.status(500).json({ error: 'Une erreur est survenue lors de la modification de l\'univers.' });
-      });
-  });
+  const updateData = {
+    id: req.params.id,
+    name: req.body.name,
+    description: req.body.description
+  };
+
+  universeRepository.getUniverseById(req.params.id) // Vérifier si l'univers existe avant la mise à jour
+    .then(existingUniverse => {
+      if (existingUniverse) {
+        return universeRepository.updateUniverse(updateData);
+      } else {
+        throw new Error('Univers non trouvé'); // Lancer une erreur personnalisée
+      }
+    })
+    .then(updatedUniverse => {
+      res.json(updatedUniverse);
+    })
+    .catch(error => {
+      console.error('Erreur lors de la mise à jour de l\'univers :', error);
+      if (error.message === 'Univers non trouvé') {
+        res.status(404).json({ error: 'Univers non trouvé' });
+      } else {
+        res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'univers' });
+      }
+    });
+});
 
   //Suppression d'un univers
   router.delete('/:x', (req, res) => {
@@ -78,23 +101,6 @@ router.get('/', (req, res) => {
       .catch((error) => {
         // Gérer les erreurs
         res.status(500).json({ error: 'Une erreur est survenue lors de la suppression de l\'univers.' });
-      });
-  });
-  
-  // Suppression d'un univers et de tous les personnages associés
-  router.delete('/:x', (req, res) => {
-    const universeId = req.params.x;
-  
-    universeRepository.deleteUniverseAndCharacters(universeId)
-      .then(success => {
-        if (success) {
-          res.status(200).json({ message: 'Univers et personnages supprimés avec succès' });
-        } else {
-          res.status(404).json({ error: 'Aucun univers trouvé avec cet identifiant' });
-        }
-      })
-      .catch(error => {
-        res.status(500).json({ error: 'Erreur lors de la suppression de l\'univers et des personnages' });
       });
   });
   

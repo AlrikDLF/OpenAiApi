@@ -3,6 +3,8 @@ const Universe = require('../entities/Universe');
 
 
 class UniverseRepository {
+
+  //getAllUnivers
   async getAllUniverses() {
     try {
       const rows = await new Promise((resolve, reject) => {
@@ -13,8 +15,7 @@ class UniverseRepository {
       });
   
       if (rows.length > 0) {
-        const universes = rows.map(row => new Universe(row.id, row.name, row.description));
-        console.log(universes);
+        const universes = rows.map(row => new Universe(row.id, row.name, row.description, row.createdAt, row.updatedAt));
         return universes;
       } else {
         return null;
@@ -36,8 +37,8 @@ class UniverseRepository {
       });
   
       if (rows.length > 0) {
-        const { id, name, description, creator_id, createdAt, updatedAt } = rows[0];
-        return new Universe(id, name, description, creator_id, createdAt, updatedAt);
+        const { id, name, description, createdAt, updatedAt } = rows[0];
+        return new Universe(id, name, description, createdAt, updatedAt);
       } else {
         return null;
       }
@@ -63,16 +64,16 @@ class UniverseRepository {
   async addUniverse(universe) {
     try {
       const result = await new Promise((resolve, reject) => {
-        db.query('INSERT INTO universe (name, description) VALUES (?, ?)',
+        db.query('INSERT INTO universe (name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?)',
           [universe.name, universe.description, universe.createdAt, universe.updatedAt],
           (err, result) => {
             if (err) reject(err);
             resolve(result);
+            console.log(universe);
           }
-        );
-      });
-  
-      if (result.affectedRows > 0) {
+          );
+        });
+        if (result.insertId > 0) {
         return result.insertId;
       } else {
         return null;
@@ -82,16 +83,6 @@ class UniverseRepository {
       return null;
     }
   }  
-
-  updateUniverse(universe) {
-    return db.query('UPDATE universe SET name = ?, description = ? WHERE id = ?', [universe.name, universe.description, universe.id])
-      .then(result => {
-        if (result.affectedRows > 0) {
-          return universe;
-        }
-        return null;
-      });
-  }
 
   //updateUniverse
   async updateUniverse(universe) {
@@ -119,7 +110,6 @@ class UniverseRepository {
   //deleteUniverse
   async deleteUniverse(universe) {
     try {
-        console.log(user);
       const result = await new Promise((resolve, reject) => {
         db.query('DELETE FROM universe WHERE id = ?',
           [universe],
@@ -129,7 +119,6 @@ class UniverseRepository {
           }
         );
       });
-  
       if (result.affectedRows > 0) {
         return true; // La suppression a réussi
       } else {
@@ -141,53 +130,34 @@ class UniverseRepository {
     }
   }  
 
-  //--------------------
+  // TO CHECK AND MODIFY [IN PROGRESS] :
 
-  deleteUniverseAndCharacters(universeId) {
-    return new Promise((resolve, reject) => {
-      // Supprimer les personnages associés à l'univers
-      db.query('DELETE FROM character WHERE universeId = ?', [universeId])
-        .then(() => {
-          // Supprimer l'univers lui-même
-          return db.query('DELETE FROM universe WHERE id = ?', [universeId]);
-        })
-        .then(result => {
-          if (result.affectedRows > 0) {
-            resolve(true); // La suppression a réussi
-          } else {
-            resolve(false); // Aucun univers n'a été supprimé
-          }
-        })
-        .catch(error => {
-          reject(error); // Une erreur s'est produite lors de la suppression
-        });
-    });
-  }
-
-  //TO CHECK AND MODIFY :
-
-  //deleteUniverseAndCharacters
-  async deleteUniverseAndCharacters(universe) {
+  async deleteUniverseAndCharacters(universeId) {
     try {
-        console.log(universe);
-      const result = await new Promise((resolve, reject) => {
-        db.query('DELETE FROM universe WHERE id = ?',
-          [universe],
-          (err, result) => {
-            if (err) reject(err);
-            resolve(result);
-          }
-        );
+      await new Promise((resolve, reject) => {
+        // Supprimer les personnages associés à l'univers
+        db.query('DELETE FROM character WHERE universeId = ?', [universeId], (err, result) => {
+          if (err) reject(err);
+          resolve(result);
+        });
       });
   
+      const result = await new Promise((resolve, reject) => {
+        // Supprimer l'univers lui-même
+        db.query('DELETE FROM universe WHERE id = ?', [universeId], (err, result) => {
+          if (err) reject(err);
+          resolve(result);
+        });
+      });
+
       if (result.affectedRows > 0) {
         return true; // La suppression a réussi
       } else {
-        return false; // Aucun univers trouvé avec cet ID
+        return false; // Aucun univers n'a été supprimé
       }
     } catch (error) {
-      console.error('Une erreur s\'est produite lors de la suppression de l\'univers :', error);
-      return false; // Erreur lors de la suppression
+      console.error('Une erreur s\'est produite lors de la suppression de l\'univers et des personnages :', error);
+      return null;
     }
   }  
 }

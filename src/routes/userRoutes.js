@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
     })
     .catch(error => {
       // Gestion des erreurs lors de la récupération des utilisateurs
-      res.status(500).json({ error: 'Failed to get users' });
+      res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
     }); 
 });
 
@@ -42,8 +42,6 @@ router.get('/:id', (req, res) => {
 // Création d'un nouvel utilisateur
 router.post('/', (req, res) => {
 
-  console.log(res.data);
-
   const newUser = {
     username: req.body.username,
     email: req.body.email,
@@ -69,7 +67,7 @@ router.post('/', (req, res) => {
 });
 
 
-// Modification d'un utilisateur | Vérification du token
+// Modification d'un utilisateur 
 router.put('/:id', (req, res) => {
   
   const updateData = {
@@ -104,7 +102,6 @@ router.put('/:id', (req, res) => {
 // Suppression d'un utilisateur
 router.delete('/:x', (req, res) => {
   const userId = req.params.x;
-  console.log(userId);
   userRepository.deleteUser(userId)
     .then(result => {
       if (result) {

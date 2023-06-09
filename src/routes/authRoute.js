@@ -1,8 +1,7 @@
-// Identification afin de récupérer un token JWT
 const jwt = require('jsonwebtoken');
-const { sign } = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
+const OPENAI_API_KEY = require('./.env');
 
 router.use(express.json());
 
@@ -17,30 +16,37 @@ router.post('/auth', (req, res) => {
       username: username
     };
 
-    function generateSecretKey(length) {
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let secretKey = '';
-      
-      for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        secretKey += characters.charAt(randomIndex);
-      }
-      
-      return secretKey;
-    }
-    
-    secretKey = generateSecretKey(32); // Génère une clé secrète de 32 caractères aléatoires
+    const secretKey = OPENAI_API_KEY;
 
-    // Générer le token JWT avec une clé secrète
-    const secretKey = 'your_secret_key';
+    // Générer le token JWT
     const token = jwt.sign(payload, secretKey);
 
-    // Retourner le token JWT dans la réponse
-    res.json({ token: token });
+    res.json({ token });
   } else {
-    // Les informations d'identification sont invalides
     res.status(401).json({ error: 'Identifiants invalides' });
   }
 });
+
+// Middleware pour vérifier le JWT dans les routes protégées
+function verifyToken(req, res, next) {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ error: 'JWT manquant' });
+  }
+
+  const secretKey = OPENAI_API_KEY;
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: 'JWT invalide' });
+    }
+
+    // Ajoutez les informations du JWT décodé à l'objet de requête pour une utilisation ultérieure
+    req.user = decoded;
+
+    next();
+  });
+}
 
 module.exports = router;

@@ -32,13 +32,12 @@ const express = require('express');
 // Charger les routes 
 app.use(express.json());
 app.use('/users', userRoutes);
-app.use('/conversations', conversationRoutes);
-app.use('/universes', universeRoutes);
 app.use('/characters', characterRoutes);
+app.use('/universes', universeRoutes);
+app.use('/conversations', conversationRoutes);
 
-// Envoi d'un message à OpenAi
-
-function sendMessage(message){
+// Envoi d'un message à OpenAi©©
+/* function sendMessage(message){
   const response = await openai.createCompletion({
     model: "text-davinci-003",
     prompt: message,
@@ -50,7 +49,7 @@ function sendMessage(message){
     stop: ["You:"],
   });
   return response.data.choices[0].text;
-}
+} */
 
 
 // Démarrer le serveur sur le port 3000
